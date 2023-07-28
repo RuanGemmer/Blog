@@ -3,6 +3,7 @@ from utils.rands import slugify_new
 from django.contrib.auth.models import User
 from utils.images import resize_image
 from django_summernote.models import AbstractAttachment
+from blog.managers import PostManager
 
 
 class PostAttachment(AbstractAttachment):
@@ -104,6 +105,8 @@ class Post(models.Model):
     class Meta:
         verbose_name = 'Post'
         verbose_name_plural = 'Posts'
+
+    objects = PostManager()
 
     title = models.CharField(max_length=65)
     slug = models.SlugField(
