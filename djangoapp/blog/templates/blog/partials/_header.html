@@ -2,41 +2,45 @@
 <header class="header section-wrapper">
   <div class="section-content-wide">
     <div class="section-gap">
-      <h1 class="blog-title center pb-base"><a class="blog-link" href="/">Blog do Ruan</a></h1>
+      <h1 class="blog-title center pb-base"><a class="blog-link" href="/">{{site_setup.title}}</a></h1>
 
-      <p class="blog-description pb-base center">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores ipsam neque explicabo sequi, voluptas saepe porro atque provident, reiciendis natus harum labore nisi eum consectetur cumque minima dolorem adipisci? Dolores?</p>
+      {% if site_setup.show_description %}
+        <p class="blog-description pb-base center">{{site_setup.description}}</p>
+      {% endif %}
 
-      <div class="search pb-base center">
-        {% include 'blog/partials/_search.html' %}
-      </div>
+      {% if site_setup.show_search %}
+        <div class="search pb-base center">
+          {% include 'blog/partials/_search.html' %}
+        </div>
+      {% endif %}
 
       <input id="closemenu" class="closemenu" type="checkbox" aria-label="close menu" role="button" aria-pressed="true" />
       <label class="closemenulabel" for="closemenu"></label>
 
       <div class="menu">
         <div class="menucontent">
-          <h1 class="menu-blog-title center pb-base"><a class="blog-link" href="/">Blog do Ruan</a></h1>
+          <h1 class="menu-blog-title center pb-base"><a class="blog-link" href="/">{{site_setup.title}}</a></h1>
 
-          <div class="menu-search pb-base center">
-            {% include 'blog/partials/_search.html' %}
-          </div>
+          {% if site_setup.show_description %}
+            <p class="menu-blog-description pb-base center">{{site_setup.description}}</p>
+          {% endif %}
+
+          {% if site_setup.show_search %}
+            <div class="menu-search pb-base center">
+              {% include 'blog/partials/_search.html' %}
+            </div>
+          {% endif %}
           <nav>
             <ul class="menu-items" onclick="getElementById('closemenu').checked=false;">
-              <li class="menu-item">
-                <a class="menu-link" href="/post/">Post</a>
-              </li>
-              <li class="menu-item">
-                <a class="menu-link" href="/page/">Page</a>
-              </li>
-              <li class="menu-item">
-                <a class="menu-link" href="#">About us</a>
-              </li>
-              <li class="menu-item">
-                <a class="menu-link" href="#">Contact</a>
-              </li>
-              <li class="menu-item">
-                <a class="menu-link" href="#">Support</a>
-              </li>
+              {% for link in site_setup.menulink_set.all %}
+                <li class="menu-item">
+                  {% if link.new_tab %}
+                  <a class="menu-link" target="_blank" href="{{link.url_or_path}}">{{link.text}}</a>
+                  {% else %}
+                    <a class="menu-link" href="{{link.url_or_path}}">{{link.text}}</a>
+                  {% endif %}
+                </li>
+              {% endfor %}
             </ul>
           </nav>
         </div>
