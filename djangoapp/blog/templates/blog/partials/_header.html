@@ -1,18 +1,12 @@
 <header class="header section-wrapper">
   <div class="section-content-wide">
     <div class="section-gap">
-      <h1 class="blog-title center pb-base"><a class="blog-link" href="/">Blog do Luiz</a></h1>
+      <h1 class="blog-title center pb-base"><a class="blog-link" href="/">Blog do Ruan</a></h1>
 
       <p class="blog-description pb-base center">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores ipsam neque explicabo sequi, voluptas saepe porro atque provident, reiciendis natus harum labore nisi eum consectetur cumque minima dolorem adipisci? Dolores?</p>
 
       <div class="search pb-base center">
-        <form class="search-form" action="#" method="get">
-          <div class="search-content">
-            <label class="sr-only" id="search-label" for="search-input">Search</label>
-            <input class="search-input" type="search" name="search" id="search-input" placeholder="Search" value="Non risu potius quam oratione eiciendum? Quo pleb " />
-            <button class="search-btn" type="submit" aria-labelledby="search-label"><i class="fa fa-search"></i></button>
-          </div>
-        </form>
+        {% include 'blog/partials/_search.html' %}
       </div>
 
       <input id="closemenu" class="closemenu" type="checkbox" aria-label="close menu" role="button" aria-pressed="true" />
@@ -20,6 +14,11 @@
 
       <div class="menu">
         <div class="menucontent">
+          <h1 class="menu-blog-title center pb-base"><a class="blog-link" href="/">Blog do Ruan</a></h1>
+
+          <div class="menu-search pb-base center">
+            {% include 'blog/partials/_search.html' %}
+          </div>
           <nav>
             <ul class="menu-items" onclick="getElementById('closemenu').checked=false;">
               <li class="menu-item">
