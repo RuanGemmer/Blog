@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from utils.images import resize_image
 from django_summernote.models import AbstractAttachment
 from blog.managers import PostManager
+from django.urls import reverse
 
 
 class PostAttachment(AbstractAttachment):
@@ -168,6 +169,12 @@ class Post(models.Model):
             resize_image(self.cover, 900)
 
         return super_save
+
+    def get_absolute_url(self):
+        if not self.is_published:
+            return reverse('blog:index')
+
+        return reverse('blog:post', args=(self.slug,))
 
     def __str__(self) -> str:
         return self.title

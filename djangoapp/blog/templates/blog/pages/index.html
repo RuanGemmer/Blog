@@ -5,11 +5,19 @@
     <div class="section-content-wide">
       <div class="section-gap">
 
+        {% if page_obj %}
         <div class="card-grid">
           {% for post in page_obj %}
             {% include 'blog/partials/_post_card.html' with i=forloop.counter0 %}
           {% endfor %}
         </div>
+        {% else %}
+        <div class="center">
+          <h2>Nothing found here 😔</h2>
+          <p>We couldn't find any information on that link. You can return to the <a href="{% url 'blog:index' %}">homepage here!</a>
+          </p>
+        </div>
+        {% endif %}
 
       </div>
     </div>
