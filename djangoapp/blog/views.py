@@ -73,6 +73,25 @@ class CreatedByListView(PostListView):
         return queryset
 
 
+class CategoryListView(PostListView):
+    allow_empty = False
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return super().get_queryset().filter(
+            category__slug=self.kwargs.get("slug")
+        )
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        ctx.update({
+            'page_title':
+            f'{self.object_list[0].category.name}'  # type: ignore
+            '- Category - '
+        })
+
+        return ctx
+
+
 def post(request, slug):
     post_obj = Post.objects.get_published().filter(slug=slug).first()
 
@@ -101,33 +120,6 @@ def page(request, slug):
         {
             'page': page_obj,
             'page_title': f'{page_obj.title} - Page - '
-        }
-    )
-
-
-def created_by(request, pk):
-    posts = Post.objects.get_published().filter(created_by__pk=pk)
-    paginator = Paginator(posts, POST_PER_PAGE)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    user = User.objects.filter(pk=pk).first()
-
-    if user is None:
-        raise Http404()
-
-    user_full_name = user.username
-
-    if user.first_name:
-        user_full_name = f'{user.first_name.capitalize()} \
-            {user.last_name.capitalize()}'
-
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': page_obj,
-            'page_title': f'{user_full_name} - Posts - '
         }
     )
 
