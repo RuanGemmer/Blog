@@ -3,7 +3,7 @@ from utils.rands import slugify_new
 from django.contrib.auth.models import User
 from utils.images import resize_image
 from django_summernote.models import AbstractAttachment
-from blog.managers import PostManager
+from blog.managers import IsPublishedManager
 from django.urls import reverse
 
 
@@ -78,6 +78,8 @@ class Page(models.Model):
         verbose_name = 'Page'
         verbose_name_plural = 'Pages'
 
+    objects = IsPublishedManager()
+
     title = models.CharField(max_length=65)
     slug = models.SlugField(
         unique=True,
@@ -91,6 +93,12 @@ class Page(models.Model):
         help_text='If checked, the page is displayed publicly on the blog'
     )
     content = models.TextField()
+
+    def get_absolute_url(self):
+        if not self.is_published:
+            return reverse('blog:index')
+
+        return reverse('blog:page', args=(self.slug,))
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -107,7 +115,7 @@ class Post(models.Model):
         verbose_name = 'Post'
         verbose_name_plural = 'Posts'
 
-    objects = PostManager()
+    objects = IsPublishedManager()
 
     title = models.CharField(max_length=65)
     slug = models.SlugField(

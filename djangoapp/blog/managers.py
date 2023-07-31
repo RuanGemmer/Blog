@@ -1,6 +1,6 @@
 from django.db import models
 
 
-class PostManager(models.Manager):
+class IsPublishedManager(models.Manager):
     def get_published(self):
         return self.filter(is_published=True).order_by('-pk')
