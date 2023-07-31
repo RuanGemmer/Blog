@@ -1,12 +1,11 @@
 from typing import Any, Dict
-from django import http
 from django.db.models.query import QuerySet
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from blog.models import Post, Page
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.http import Http404, HttpRequest, HttpResponse
-from django.views.generic.list import ListView
+from django.views.generic import ListView, DetailView
 
 
 POST_PER_PAGE: int = 9
@@ -148,52 +147,37 @@ class SearchListView(PostListView):
         return super().get(request, *args, **kwargs)
 
 
-def post(request, slug):
-    post_obj = Post.objects.get_published().filter(slug=slug).first()
+class PageDetailView(DetailView):
+    model = Page
+    template_name = 'blog/pages/page.html'
+    slug_field = 'slug'
+    context_object_name = 'page'
 
-    if post_obj is None:
-        raise Http404()
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        ctx.update({
+            'page_title': f'{self.get_object().title} - Page - '  # type:ignore
+        })
 
-    return render(
-        request,
-        'blog/pages/post.html',
-        {
-            'post': post_obj,
-            'page_title': f'{post_obj.title} - Post - '
-        }
-    )
+        return ctx
 
-
-def page(request, slug):
-    page_obj = Page.objects.get_published().filter(slug=slug).first()
-
-    if page_obj is None:
-        raise Http404()
-
-    return render(
-        request,
-        'blog/pages/page.html',
-        {
-            'page': page_obj,
-            'page_title': f'{page_obj.title} - Page - '
-        }
-    )
+    def get_queryset(self) -> QuerySet[Any]:
+        return super().get_queryset().filter(is_published=True)
 
 
-def search(request):
-    search_value = request.GET.get('search', '').strip()
-    posts = Post.objects.get_published().filter(
-        Q(title__icontains=search_value) |
-        Q(summary__icontains=search_value) |
-        Q(content__icontains=search_value)
-    )[:POST_PER_PAGE]
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'blog/pages/post.html'
+    slug_field = 'slug'
+    context_object_name = 'post'
 
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': posts,
-            'search_value': search_value,
-            'page_title': f'{search_value[:20]} - Search - '
-        }
-    )
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        ctx.update({
+            'page_title': f'{self.get_object().title} - Post - '  # type:ignore
+        })
+
+        return ctx
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return super().get_queryset().filter(is_published=True)
