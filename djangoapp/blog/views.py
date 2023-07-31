@@ -1,28 +1,38 @@
+from typing import Any, Dict
+from django.db.models.query import QuerySet
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from blog.models import Post, Page
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.http import Http404
+from django.views.generic.list import ListView
 
 
 POST_PER_PAGE: int = 9
 
 
-def index(request):
-    posts = Post.objects.get_published()
-    paginator = Paginator(posts, POST_PER_PAGE)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+class PostListView(ListView):
+    model = Post
+    template_name = 'blog/pages/index.html'
+    context_object_name = 'posts'
+    ordering = '-pk'
+    paginate_by = POST_PER_PAGE
+    queryset = Post.objects.get_published()
 
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': page_obj,
-            'page_title': 'Home - '
-        }
-    )
+    # def get_queryset(self) -> QuerySet[Any]:
+    #     queryset = super().get_queryset()
+    #     queryset = queryset.filter(is_published=True)
+    #     return queryset
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            'page_title': 'Home - ',
+        })
+
+        return context
 
 
 def post(request, slug):
