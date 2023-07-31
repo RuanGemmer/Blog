@@ -20,11 +20,6 @@ class PostListView(ListView):
     paginate_by = POST_PER_PAGE
     queryset = Post.objects.get_published()
 
-    # def get_queryset(self) -> QuerySet[Any]:
-    #     queryset = super().get_queryset()
-    #     queryset = queryset.filter(is_published=True)
-    #     return queryset
-
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
@@ -33,6 +28,49 @@ class PostListView(ListView):
         })
 
         return context
+
+
+class CreatedByListView(PostListView):
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self._temp_context: dict[str, Any] = {}
+
+    def get(self, request, *args, **kwargs):
+        pk_ = self.kwargs.get('pk')
+        user = User.objects.filter(pk=pk_).first()
+
+        if user is None:
+            raise Http404()
+
+        self._temp_context.update({
+            'author_pk': pk_,
+            "user": user,
+        })
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        user = self._temp_context['user']
+
+        user_full_name = user.username
+        if user.first_name:
+            user_full_name = f'{user.first_name.capitalize()} \
+                {user.last_name.capitalize()}'
+
+        context.update({
+            'page_title': f'{user_full_name} - Posts - '
+        })
+
+        return context
+
+    def get_queryset(self) -> QuerySet[Any]:
+        queryset = super().get_queryset()
+
+        queryset = queryset.filter(
+            created_by__pk=self._temp_context['user'].pk
+        )
+        return queryset
 
 
 def post(request, slug):
